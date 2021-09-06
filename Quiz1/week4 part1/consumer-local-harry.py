@@ -10,7 +10,25 @@ c = Consumer({
 # c.subscribe(['streams-pageviewstats-untyped-output'])
 c.subscribe(['streams-pageview-input'])              
 
+
+def Harry_count(str):
+    #counts = dict()
+    count = 0
+    harry = 'Harry'
+    sentence = str.split()
+
+    for word in sentence:
+        if harry in sentence:
+            # counts[word] += 1
+            count += 1    
+        else:
+            # counts[word] = 1
+            pass
+    
+    return count
+
 print("Start consumer...")
+
 while True:
     msg = c.poll(0)
 
@@ -24,6 +42,8 @@ while True:
         
     kvalue = msg.key().decode("utf-8", "ignore")
     print(kvalue)
+    print(Harry_count(kvalue))
+    
     # , {1}'.format(kvalue, value))
     
     
