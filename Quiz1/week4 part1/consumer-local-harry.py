@@ -7,8 +7,8 @@ c = Consumer({
     'auto.offset.reset': 'earliest'
 })
 
-c.subscribe(['streams-pageviewstats-untyped-output'])
-              
+# c.subscribe(['streams-pageviewstats-untyped-output'])
+c.subscribe(['streams-pageview-input'])              
 
 print("Start consumer...")
 while True:
@@ -23,7 +23,8 @@ while True:
     value = msg.value().decode()
         
     kvalue = msg.key().decode("utf-8", "ignore")
-    print('Received message: {0} , {1}'.format(kvalue, value))
+    print(kvalue)
+    # , {1}'.format(kvalue, value))
     
     
 c.close()
