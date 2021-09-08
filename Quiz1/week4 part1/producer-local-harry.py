@@ -31,9 +31,11 @@ with open('Harry-Potter.txt','r',encoding="utf8") as f:
 for line in content:
     # print(line)
     p.poll(0)
-    r1 = {"user":line, "timestamp": int(time.time()*1000)}
-    p.produce('streams-pageview-input', key=line, value=json.dumps(r1))
+    # r1 = {"user":line, "timestamp": int(time.time()*1000)}
+    # p.produce('streams-pageview-input', key=line, value=json.dumps(r1))
+    p.produce('streams-plaintext-input', line)
     time.sleep(1)
+    print(line)
 
 # while True:
 # # for i in range(3):

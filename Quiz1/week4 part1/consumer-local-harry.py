@@ -8,24 +8,24 @@ c = Consumer({
 })
 
 # c.subscribe(['streams-pageviewstats-untyped-output'])
-c.subscribe(['streams-pageview-input'])              
+c.subscribe(['streams-wordcount-output'])              
 
 
-def Harry_count(str):
-    #counts = dict()
-    count = 0
-    harry = 'Harry'
-    sentence = str.split()
+# def Harry_count(str):
+#     #counts = dict()
+#     count = 0
+#     harry = 'Harry'
+#     sentence = str.split()
 
-    for word in sentence:
-        if harry in sentence:
-            # counts[word] += 1
-            count += 1    
-        else:
-            # counts[word] = 1
-            pass
+#     for word in sentence:
+#         if harry in sentence:
+#             # counts[word] += 1
+#             count += 1    
+#         else:
+#             # counts[word] = 1
+#             pass
     
-    return count
+#     return count
 
 print("Start consumer...")
 
@@ -37,12 +37,15 @@ while True:
     if msg.error():
         print("Consumer error: {}".format(msg.error()))
         continue
+    # print('---'*10)
+    # print(msg)
 
     value = msg.value().decode()
         
     kvalue = msg.key().decode("utf-8", "ignore")
-    print(kvalue)
-    print(Harry_count(kvalue))
+
+    print(kvalue, value)
+    # print(Harry_count(kvalue))
     
     # , {1}'.format(kvalue, value))
     
