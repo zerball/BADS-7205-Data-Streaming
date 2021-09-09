@@ -38,13 +38,17 @@ while True:
         print("Consumer error: {}".format(msg.error()))
         continue
     # print('---'*10)
-    # print(msg)
+    print(msg)
 
-    value = msg.value().decode()
+    # value = msg.value().decode()
+    value = int.from_bytes(msg.value(),"big")
         
     kvalue = msg.key().decode("utf-8", "ignore")
 
-    print(kvalue, value)
+    print(kvalue, type(value), value)
+    
+    # time.sleep(1)
+    
     # print(Harry_count(kvalue))
     
     # , {1}'.format(kvalue, value))
