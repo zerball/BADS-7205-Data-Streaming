@@ -35,6 +35,7 @@ import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 
 import org.apache.kafka.streams.kstream.Suppressed;
+import org.apache.kafka.streams.kstream.Materialized;
 
 public final class WordCountDemo {
 
@@ -72,53 +73,34 @@ public final class WordCountDemo {
     static void createWordCountStream(final StreamsBuilder builder) {
         final KStream<String, String> source = builder.stream(INPUT_TOPIC);
 
-		// Harry Catching
+		final KGroupedStream<String, String> countHarry = source
+            .flatMapValues(value -> Arrays.asList(value.toLowerCase().split("\\W+")))
+			.selectKey((ignoredkey, value) -> {
+            if (value.equals("harry")) {
+                return "harry";
+            } else {
+                return "another";
+             }})
+            .groupByKey();	
+
+	
 		final KTable<Windowed<String>, Long> catch_harry = source
-			// .flatMapValues(value -> Arrays.asList(value.toLowerCase(Locale.getDefault()).split(" ")))
-            .flatMapValues(value -> Arrays.asList(value.toLowerCase(Locale.getDefault()).split("\\W+")))
-			// .filter((key, value) -> value.equals("harry")) // .contain or equals()
-            // .groupBy((key, value) -> value)
-			// .windowedBy(TimeWindows.of(Duration.ofSeconds(TEMPERATURE_WINDOW_SIZE)))
-            // .count()
-			// .suppress(Suppressed.untilWindowCloses(Suppressed.BufferConfig.unbounded()));
-			.filter((key, value) -> value.equals("harry"))
-			.groupBy((key, value) -> value)
-			.windowedBy(TimeWindows.of(Duration.ofSeconds(TEMPERATURE_WINDOW_SIZE)))
-			.count();
-			// .suppress(Suppressed.untilWindowCloses(Suppressed.BufferConfig.unbounded()))
-			
-			// .toStream();
-
-
-		// ---------------------------------------------------------------------------------------------------
-        // temperature values are sent without a key (null), so in order
-        // to group and reduce them, a key is needed ("temp" has been chosen)
-        // https://kafka.apache.org/23/javadoc/org/apache/kafka/streams/kstream/KStream.html
-        // final KStream<Windowed<String>, Long> max = catch_harry
-        //     .selectKey((key, value) -> key)
-        //     .groupBy()
-        //     .windowedBy(TimeWindows.of(Duration.ofSeconds(5)))
-        //     .reduce((value1, value2) -> {
-        //         if (Integer.parseInt(value1) > Integer.parseInt(value2)) {
-        //             return value1;
-        //         } else {
-        //             return value2;
-        //         }
-        //     })
-        //     .toStream();
-        //     //.filter((key, value) -> Integer.parseInt(value) > TEMPERATURE_THRESHOLD);
-
-        // final Serde<Windowed<String>> windowedSerde = WindowedSerdes.timeWindowedSerdeFrom(String.class);
-
-        // // need to override key serde to Windowed<String> type
-        // max.to(OUTPUT_TOPIC, Produced.with(windowedSerde, Serdes.String()));
-		// ---------------------------------------------------------------------------------------------------
+            // .flatMapValues(value -> Arrays.asList(value.toLowerCase(Locale.getDefault()).split("\\W+")))
+			// .filter((key, value) -> value.equals("harry")) // .contains
+			// .groupBy((key, value) -> value)
+			.windowedBy(TimeWindows.of(Duration.ofSeconds(TEMPERATURE_WINDOW_SIZE)).grace(Duration.ofMillis(0)))
+			.count(Materialized.with(Serdes.String(), Serdes.Long()))
+			.selectKey((key, value) -> {
+            if (key.equals("harry")) {
+                return value;
+            } else {
+                return 0;
+             }})
+			.suppress(Suppressed.untilWindowCloses(Suppressed.BufferConfig.unbounded()));
 
 		// Go ahead Harry
-		// catch_harry.toStream().to(OUTPUT_TOPIC, Produced.with(Serdes.String(), Serdes.Long()));
-
-		// Go ahead Harry 2
 		final Serde<Windowed<String>> windowedSerde = WindowedSerdes.timeWindowedSerdeFrom(String.class);
+		
 		catch_harry.toStream().to(OUTPUT_TOPIC, Produced.with(windowedSerde, Serdes.Long()));
 
 

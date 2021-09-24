@@ -9,31 +9,38 @@ def delivery_report(err, msg):
     if err is not None:
         print('Message delivery failed: {}'.format(err))
     else:
-        print('Message delivered to {} [{}]'.format(msg.topic(), msg.partition()))
-
-# uList = ["user1","user2"]
-# pList = ["page1","page2","page3","page4","page5"]
-# rList = ["asia","europe","america"]
+        # print('Message delivered to {} [{}]'.format(msg.topic(), msg.partition()))
+        print('Message delivered to {}'.format(msg.value().decode('utf-8')))
 
 
-import json
-import random
+# import json
+# import random
 
-# Trigger any available delivery report callbacks from previous produce() calls
-# p.poll(0)
-i = 0
+# i = 0
+
+#### SET INPUT TOPIC #####
+set_input_topic = 'streams-plaintext-input'
+# set_input_topic = 'streams-plaintext-input'
+
 print("Start producer...")
 
-with open('Harry-Potter.txt','r',encoding="utf8") as f:
-    content = f.readlines()
-    # print(content)
+# with open('Harry-Potter.txt','r',encoding="utf8") as f:
+#     content = f.readlines()
 
-for line in content:
+### READ ALL FILE -- HARRY ###
+file1 = open('Harry-Potter.txt', 'r', encoding = 'utf-8')
+Lines = file1.readlines()
+###########################
+
+for line in Lines:
     # print(line)
     p.poll(0)
     # r1 = {"user":line, "timestamp": int(time.time()*1000)}
     # p.produce('streams-pageview-input', key=line, value=json.dumps(r1))
-    p.produce('streams-plaintext-input', line)
+    # p.produce('streams-plaintext-input', line)
+    sendMsg = line.encode().decode('utf-8').strip('\n')
+    p.produce(set_input_topic, sendMsg , callback=delivery_report)
+
     time.sleep(1)
     print(line)
 

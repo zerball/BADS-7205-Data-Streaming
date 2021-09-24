@@ -10,7 +10,6 @@ c = Consumer({
 # c.subscribe(['streams-pageviewstats-untyped-output'])
 c.subscribe(['streams-wordcount-output'])              
 
-
 # def Harry_count(str):
 #     #counts = dict()
 #     count = 0
@@ -29,23 +28,34 @@ c.subscribe(['streams-wordcount-output'])
 
 print("Start consumer...")
 
+time.time()
+
 while True:
     msg = c.poll(0)
+    # print(msg)
 
     if msg is None:
+        # print('Received message: harry , 0')
         continue
     if msg.error():
         print("Consumer error: {}".format(msg.error()))
         continue
-    # print('---'*10)
-    print(msg)
-
-    # value = msg.value().decode()
+    
+    #############################################################
     value = int.from_bytes(msg.value(),"big")
         
     kvalue = msg.key().decode("utf-8", "ignore")
 
-    print(kvalue, type(value), value)
+    if "harry" in kvalue:
+        print('Received message: {0} , {1}'.format("harry", value))
+    else:
+        print('Received message: {0} , {1}'.format("harry", 0))
+
+    # print('Received message: {0} , {1}'.format(kvalue, value))
+    #############################################################
+    print(time.time())
+    
+    # print(kvalue, type(value), value)
     
     # time.sleep(1)
     
