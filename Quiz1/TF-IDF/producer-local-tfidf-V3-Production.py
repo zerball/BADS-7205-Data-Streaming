@@ -36,7 +36,8 @@ wholeBook = Lines.split('|')
 # wholeBook = Lines.split('Harry Potter and the Philosophers Stone - J.K. Rowling')
 
 run_page = 1
-for sentence in wholeBook[:-1]:
+# for sentence in wholeBook[:-1]:
+for sentence in wholeBook[:10]:
     SentenceClean = ''
     sentence = sentence.lower()
     find_words = re.compile(r'\w+').findall(sentence)
